@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ title }} | Sri Murugan Travels</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
+    <style>
+        body { background-color: #f4f7f6; font-family: 'Plus Jakarta Sans', sans-serif; }
+        .navbar-custom { background-color: rgba(33, 37, 41, 0.95); backdrop-filter: blur(10px); padding: 20px 0; }
+        .section-title { position: relative; display: inline-block; margin-bottom: 40px; font-weight: 800; color: #1a202c; text-transform: uppercase; }
+        .section-title::after { content: ''; width: 50%; height: 4px; background: #3182ce; position: absolute; bottom: -10px; left: 25%; border-radius: 2px; }
+        .car-card { border-radius: 24px; transition: 0.4s; border: 1px solid rgba(0,0,0,0.05); background: #ffffff; overflow: hidden; }
+        .car-card:hover { transform: translateY(-10px); box-shadow: 0 20px 40px rgba(0,0,0,0.1); }
+        .img-container { height: 180px; overflow: hidden; }
+        .img-container img { width: 100%; height: 100%; object-fit: cover; }
+        .bata-badge { background: #fff5f5; color: #e53e3e; padding: 4px 12px; border-radius: 8px; font-weight: 600; font-size: 0.8rem; }
+    </style>
+</head>
+<body>
+
+    <nav class="navbar-custom text-center shadow-sm">
+        <div class="container">
+            <h2 class="text-white fw-bold mb-0">SRI MURUGAN <span class="text-primary">TRAVELS</span></h2>
+            <a href="javascript:void(0);" onclick="window.history.back();" class="btn btn-outline-light btn-sm rounded-pill mt-3 px-4">
+                <i class="bi bi-arrow-left"></i> Back to Rentals
+            </a>
+        </div>
+    </nav>
+
+    <div class="container my-5">
+        <div class="text-center mb-5">
+            <h2 class="section-title">{{ title }}</h2>
+        </div>
+
+        <div class="row g-4">
+            {% for c in cars %}
+            <div class="col-md-4">
+                <div class="card car-card h-100 shadow-sm p-3">
+                    <div class="img-container rounded-4">
+                        <img src="{{ c.img }}" alt="{{ c.name }}" onerror="this.src='https://images.unsplash.com/photo-1494976388531-d1058494cdd8?auto=format&fit=crop&w=400&q=80'">
+                    </div>
+                    
+                    <div class="card-body text-center mt-3">
+                        <h4 class="fw-bold text-dark">{{ c.name }}</h4>
+                        
+                        <div class="d-flex justify-content-center gap-2 mb-3">
+                            <span class="badge bg-light text-dark border rounded-pill">{{ c.type }}</span>
+                            <span class="badge bg-light text-dark border rounded-pill">{{ c.seats }} Seater</span>
+                        </div>
+
+                        <div class="bg-light p-3 rounded-4 mb-3">
+                            <h3 class="text-success fw-extrabold mb-1">{{ c.rate }}</h3>
+                            <p class="text-muted small mb-2">300 km coverage/Day</p>
+                            <span class="bata-badge">Driver Bata: {{ c.bata }}</span>
+                        </div>
+
+                        <button onclick="openCarBooking('{{ c.name }}')" class="btn btn-dark w-100 py-2 rounded-pill fw-bold">
+                            Book Now
+                        </button>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <div class="modal fade" id="carModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 shadow" style="border-radius: 20px;">
+                <div class="modal-header bg-dark text-white" style="border-radius: 20px 20px 0 0;">
+                    <h5 class="modal-title fw-bold">Rent: <span id="displayCarName"></span></h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body p-4">
+                    <form action="/save-car-booking" method="POST">
+                        <input type="hidden" id="selectedCar" name="car_name">
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label small fw-bold">Your Name</label>
+                                <input type="text" name="name" class="form-control rounded-pill" placeholder="Name" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label small fw-bold">Phone Number</label>
+                                <input type="tel" name="phone" class="form-control rounded-pill" placeholder="Phone" required>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label small fw-bold">Pickup Location</label>
+                            <input type="text" name="pickup" class="form-control rounded-pill" placeholder="From where?" required>
+                        </div>
+                        <div class="row">
+                            <div class="col-6 mb-3">
+                                <label class="form-label small fw-bold">Pickup Date</label>
+                                <input type="date" name="date" class="form-control rounded-pill" required>
+                            </div>
+                            <div class="col-6 mb-3">
+                                <label class="form-label small fw-bold">No. of Days</label>
+                                <input type="number" name="days" class="form-control rounded-pill" placeholder="Days" required>
+                            </div>
+                        </div>
+                        <button type="submit" class="btn btn-success w-100 rounded-pill py-2 fw-bold mt-3">Confirm & Send WhatsApp</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer class="bg-dark text-white p-5 mt-5 text-center">
+        <p class="mb-0">© 2026 Sri Murugan Travels. All Rights Reserved.</p>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        function openCarBooking(name) {
+            document.getElementById('selectedCar').value = name;
+            document.getElementById('displayCarName').innerText = name;
+            new bootstrap.Modal(document.getElementById('carModal')).show();
+        }
+    </script>
+</body>
+</html>

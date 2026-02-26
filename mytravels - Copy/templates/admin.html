@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Admin Panel - Sri Murugan Travels</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <style>
+        body { background-color: #f8f9fa; }
+        .card { border-radius: 15px; border: none; margin-bottom: 30px; }
+        h2, h4 { font-weight: bold; color: #333; }
+    </style>
+</head>
+<body class="container mt-5 pb-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>Admin Dashboard</h2>
+        <a href="/" class="btn btn-outline-secondary">View Website</a>
+    </div>
+
+    <div class="card mb-4 shadow-sm border-0" style="border-radius: 15px;">
+        <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center" style="border-radius: 15px 15px 0 0;">
+            <h5 class="mb-0 py-2"><i class="bi bi-list-check me-2"></i>Live Bookings Table</h5>
+            <span class="badge bg-light text-primary">{{ bookings|length }} Bookings</span>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle">
+                    <thead class="table-light">
+                        <tr>
+                            <th>ID</th>
+                            <th>Date</th>
+                            <th>Customer Name</th>
+                            <th>Phone</th>
+                            <th>Booking Details</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for b in bookings %}
+                        <tr>
+                            <td><span class="badge bg-secondary">{{ b.booking_id }}</span></td>
+                            <td class="small text-muted">{{ b.booking_date }}</td>
+                            <td class="fw-bold">{{ b.name }}</td>
+                            <td>
+                                <a href="tel:{{ b.phone }}" class="btn btn-sm btn-outline-success rounded-pill">
+                                    <i class="bi bi-telephone-fill me-1"></i> {{ b.phone }}
+                                </a>
+                            </td>
+                            <td>
+                                <div class="p-2 bg-light rounded small border-start border-4 border-primary">
+                                    {{ b.details }}
+                                </div>
+                            </td>
+                            <td>
+                                <a href="/delete-booking/{{ b.id }}" class="btn btn-outline-danger btn-sm rounded-pill" onclick="return confirm('Intha booking-ah delete panna va?')">
+                                    <i class="bi bi-trash"></i>
+                                </a>
+                            </td>
+                        </tr>
+                        {% else %}
+                        <tr>
+                            <td colspan="6" class="text-center text-muted py-5">
+                                <i class="bi bi-inbox fs-2 d-block mb-2"></i>
+                                No bookings found in database.
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div class="card p-3 mb-4 shadow-sm border-dark">
+        <h5 class="text-dark">🔍 Search Customer by Booking ID</h5>
+        <form action="/search-booking" method="get" class="d-flex gap-2 mt-2">
+            <input type="text" name="booking_id" placeholder="Enter ID (e.g., SMT-12345)" class="form-control w-25" required>
+            <button type="submit" class="btn btn-dark fw-bold">Search</button>
+        </form>
+    </div>
+
+    <div class="card p-4 shadow-sm">
+        <h4 class="text-success mb-3">Add New Main Package (Home Page)</h4>
+        <form action="/add" method="post" class="row g-3">
+            <div class="col-md-4"><input type="text" name="place" placeholder="Place Name" class="form-control" required></div>
+            <div class="col-md-2"><input type="text" name="price" placeholder="Price" class="form-control" required></div>
+            <div class="col-md-2"><input type="text" name="days" placeholder="Days" class="form-control" required></div>
+            <div class="col-md-2"><input type="text" name="km" placeholder="Details/KM" class="form-control" required></div>
+            <div class="col-md-2">
+                <select name="type" class="form-select">
+                   <option value="is_temple">Temple Tour (General)</option>
+                   <option value="is_navagraha">Navagraha Temples</option>
+                   <option value="is_divyadesam">Divya Desam Temples</option>
+                   <option value="is_kerala">Kerala Tour</option>
+                   <option value="is_karnataka">Karnataka Tour</option>
+                   <option value="is_goa">Goa Tour</option>
+                </select>
+            </div>
+            <div class="col-12"><input type="text" name="img" placeholder="Image URL (e.g., static/images/name.jpg)" class="form-control" required></div>
+            <div class="col-12"><button type="submit" class="btn btn-success w-100">Add Main Package</button></div>
+        </form>
+
+        <h5 class="mt-4">Live Main Packages</h5>
+        <div class="table-responsive">
+            <table class="table table-sm table-hover border">
+                <thead class="table-light">
+                    <tr>
+                        <th>Place</th>
+                        <th>Flag</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for p in packages %}
+                    <tr>
+                        <td>{{ p['place'] }}</td>
+                        <td><span class="badge bg-secondary">{{ p['type_flag'] }}</span></td>
+                        <td>
+                            <a href="/delete-main-package/{{ p['id'] }}" class="btn btn-danger btn-sm" onclick="return confirm('Delete?')">Delete</a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="card p-4 shadow-sm border-primary">
+        <h4 class="text-primary mb-3">Add Places (Temples / States Tours)</h4>
+        <form action="/add-temple-place" method="post" class="row g-3">
+            <div class="col-md-3">
+                <select name="category" class="form-select" required>
+                    <option value="aarupadai">Aarupadai Veedu</option>
+                    <option value="navagraha">Navagraha Temples</option>
+                    <option value="divyadesam">Divya Desam Temples</option>
+                    <option value="kerala">Kerala Tour</option>
+                    <option value="karnataka">Karnataka Tour</option>
+                    <option value="goa">Goa Tour</option>
+                </select>
+            </div>
+            <div class="col-md-3"><input type="text" name="place" placeholder="Place / Temple Name" class="form-control" required></div>
+            <div class="col-md-3"><input type="text" name="desc" placeholder="Planet / Description" class="form-control" required></div>
+            <div class="col-md-3"><input type="text" name="price" placeholder="Price (Included)" class="form-control" required></div>
+            <div class="col-12"><input type="text" name="img" placeholder="Image Path (static/images/...)" class="form-control" required></div>
+            <div class="col-12"><button type="submit" class="btn btn-primary w-100">Save Place</button></div>
+        </form>
+
+        <h5 class="mt-4">All Added Places / Temples</h5>
+        <div class="table-responsive" style="max-height: 400px; overflow-y: auto;">
+            <table class="table table-hover mt-2">
+                <thead class="table-dark" style="position: sticky; top: 0;">
+                    <tr>
+                        <th>Category</th>
+                        <th>Name</th>
+                        <th>Info</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for tp in temple_packages %}
+                    <tr>
+                        <td>
+                            <span class="badge 
+                                {% if tp['category'] == 'kerala' %}bg-success
+                                {% elif tp['category'] == 'goa' %}bg-warning text-dark
+                                {% elif tp['category'] == 'karnataka' %}bg-info text-dark
+                                {% elif tp['category'] == 'divyadesam' %}bg-primary
+                                {% else %}bg-secondary{% endif %}">
+                                {{ tp['category'] | upper }}
+                            </span>
+                        </td>
+                        <td>{{ tp['place'] }}</td>
+                        <td>{{ tp['desc'] }}</td>
+                        <td>
+                            <a href="/delete-temple/{{ tp['id'] }}" class="btn btn-danger btn-sm" onclick="return confirm('Delete panna va?')">Delete</a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    
+    <div class="card p-4 mb-5 shadow-sm border-warning">
+        <h4 class="text-warning mb-3">Add/Update Vehicle Rates (Car, Van, Bus)</h4>
+        <form action="/add-vehicle" method="post" class="row g-3 mb-4">
+            <div class="col-md-2">
+                <select name="category" class="form-select">
+                    <option value="car">Car</option>
+                    <option value="tempo">Tempo/Van</option>
+                    <option value="bus">Bus</option>
+                </select>
+            </div>
+            <div class="col-md-3"><input type="text" name="name" placeholder="Vehicle Name (e.g. Swift)" class="form-control" required></div>
+            <div class="col-md-2"><input type="text" name="rate" placeholder="Rate (e.g. ₹13/km)" class="form-control" required></div>
+            <div class="col-md-2"><input type="text" name="seats" placeholder="Seats (4+1)" class="form-control"></div>
+            <div class="col-md-3"><input type="text" name="img" placeholder="Image Path" class="form-control"></div>
+            <div class="col-md-4"><input type="text" name="bata" placeholder="Bata (e.g. 400)" class="form-control"></div>
+            <div class="col-12"><button type="submit" class="btn btn-warning w-100 text-white fw-bold">Save Vehicle Details</button></div>
+        </form>
+
+        <h5 class="mt-4">Current Vehicles & Rates (Edit & Update)</h5>
+             <table class="table align-middle">
+             <thead class="table-dark">
+        <tr>
+            <th>Category</th>
+            <th>Name & Type</th>
+            <th>Rate (Edit)</th>
+            <th>Bata (Edit)</th> 
+            <th>Action</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for v in vehicles %}
+        <tr>
+            <td><span class="badge {% if v['id'] == 'old' %}bg-secondary{% else %}bg-info text-dark{% endif %}">{{ v['category'] | upper }}</span></td>
+            <td>
+                <strong>{{ v['name'] }}</strong><br>
+                <span class="badge bg-light text-dark border">{{ v['type'] }}</span> </td>
+            <td colspan="3">
+                <form action="/update-vehicle" method="post" class="d-flex gap-2">
+                    <input type="hidden" name="id" value="{{ v['id'] }}">
+                    <input type="hidden" name="name" value="{{ v['name'] }}">
+                    <input type="hidden" name="category" value="{{ v['category'] }}">
+                    <input type="hidden" name="type" value="{{ v['type'] }}"> <input type="text" name="rate" value="{{ v['rate'] }}" class="form-control form-control-sm" style="width: 100px;">
+                    <input type="text" name="bata" value="{{ v['bata'] }}" class="form-control form-control-sm" style="width: 100px;">
+                    
+                    <button type="submit" class="btn btn-primary btn-sm">Update</button>
+                    
+                    {% if v['id'] != 'old' %}
+                        <a href="/delete-vehicle/{{ v['id'] }}" class="btn btn-danger btn-sm" onclick="return confirm('Delete?')">Delete</a>
+                    {% endif %}
+                </form>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+    </div>
+
+</body>
+</html>
