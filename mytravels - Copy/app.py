@@ -4,7 +4,7 @@ import random          # PUDHUSA ADD PANNATHU
 import urllib.parse    # PUDHUSA ADD PANNATHU
 from flask import Flask, render_template, request, redirect, session
 
-app = Flask(__name__)
+app = Flask(__name__, template_folder='templates', static_folder='static')
 app.secret_key = "sri_murugan_travels_secret" # Admin login-kaga
 
 # ==========================================
@@ -694,3 +694,4 @@ if __name__ == '__main__':
     init_db()  # Database update
     # Inga mathavum:
     app.run(host='0.0.0.0', port=10000)
+
