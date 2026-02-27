@@ -691,5 +691,6 @@ def book_package():
 # END OF NEW ROUTE
 # ==========================================
 if __name__ == '__main__':
-    init_db() # Database update
-    app.run(debug=True)
+    init_db()  # Database update
+    # Inga mathavum:
+    app.run(host='0.0.0.0', port=10000)
