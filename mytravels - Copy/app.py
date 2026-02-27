@@ -693,8 +693,11 @@ def book_package():
 # ==========================================
 if __name__ == '__main__':
     init_db()
-    # Render port configuration
+    # Inga mathavum
     port = int(os.environ.get("PORT", 10000))
     app.run(host='0.0.0.0', port=port)
+
+# Vercel-kaaga idhai extra-va add pannunga
+app = app
 
 
