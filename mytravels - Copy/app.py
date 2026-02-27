@@ -4,10 +4,9 @@ import random          # PUDHUSA ADD PANNATHU
 import urllib.parse    # PUDHUSA ADD PANNATHU
 from flask import Flask, render_template, request, redirect, session
 
-app = Flask(__name__, template_folder='templates', static_folder='static')
-DB_PATH = os.path.join(os.path.dirname(__file__), 'travels.db')
-app.secret_key = "sri_murugan_travels_secret" # Admin login-kaga
-
+app = Flask(__name__, 
+            template_folder='templates', 
+            static_folder='static')
 # ==========================================
 # STEP 1: DATABASE CONNECTION SETUP
 # ==========================================
@@ -699,5 +698,6 @@ if __name__ == '__main__':
 
 # Vercel-kaaga idhai extra-va add pannunga
 app = app
+
 
 
