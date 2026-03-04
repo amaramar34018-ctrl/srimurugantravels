@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel - Sri Murugan Travels</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <style>
+        html,body{overflow-x:hidden;} * {box-sizing:border-box;}
+        body { background-color: #f0f4f8; font-family: 'Segoe UI', sans-serif; }
+        .card { border-radius: 16px; border: none; box-shadow: 0 2px 12px rgba(0,0,0,0.07); }
+        .card-header { border-radius: 16px 16px 0 0 !important; }
+        h2, h4, h5 { font-weight: 700; }
+        .section-anchor { scroll-margin-top: 20px; }
+
+        /* Vehicle row */
+        .vehicle-row td { vertical-align: middle; }
+        .badge-cat { font-size:0.7rem; padding:4px 10px; border-radius:20px; }
+
+        /* Edit / Delete buttons */
+        .btn-edit   { background:#e8f0fe; color:#2563eb; border:none; border-radius:8px; padding:5px 12px; font-size:0.8rem; font-weight:600; }
+        .btn-edit:hover { background:#2563eb; color:#fff; }
+        .btn-del    { background:#fee2e2; color:#dc2626; border:none; border-radius:8px; padding:5px 12px; font-size:0.8rem; font-weight:600; }
+        .btn-del:hover  { background:#dc2626; color:#fff; }
+
+        /* Flash confirm */
+        .confirm-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5); z-index:9999; align-items:center; justify-content:center; }
+        .confirm-overlay.show { display:flex; }
+        .confirm-box { background:#fff; border-radius:16px; padding:30px; max-width:360px; width:90%; text-align:center; }
+    </style>
+</head>
+<body class="pb-5">
+
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2><i class="bi bi-speedometer2 me-2 text-primary"></i>Admin Dashboard</h2>
+        <div class="d-flex gap-2">
+            <a href="/" class="btn btn-outline-secondary btn-sm rounded-pill">View Website</a>
+            <a href="/login" class="btn btn-outline-danger btn-sm rounded-pill">Logout</a>
+        </div>
+    </div>
+
+    <!-- ===================== BOOKINGS TABLE ===================== -->
+    <div class="card mb-4">
+        <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center py-3">
+            <h5 class="mb-0"><i class="bi bi-list-check me-2"></i>Live Bookings</h5>
+            <span class="badge bg-light text-primary">{{ bookings|length }} Bookings</span>
+        </div>
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th>ID</th><th>Date</th><th>Name</th><th>Phone</th><th>Details</th><th>Delete</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for b in bookings %}
+                        <tr>
+                            <td><span class="badge bg-secondary">{{ b.booking_id }}</span></td>
+                            <td class="small text-muted">{{ b.booking_date }}</td>
+                            <td class="fw-bold">{{ b.name }}</td>
+                            <td><a href="tel:{{ b.phone }}" class="btn btn-sm btn-outline-success rounded-pill"><i class="bi bi-telephone-fill me-1"></i>{{ b.phone }}</a></td>
+                            <td><div class="p-2 bg-light rounded small border-start border-4 border-primary">{{ b.details }}</div></td>
+                            <td>
+                                <button class="btn-del" onclick="confirmDelete('/delete-booking/{{ b.id }}', 'Booking delete panna va?')">
+                                    <i class="bi bi-trash"></i> Delete
+                                </button>
+                            </td>
+                        </tr>
+                        {% else %}
+                        <tr><td colspan="6" class="text-center text-muted py-5"><i class="bi bi-inbox fs-2 d-block mb-2"></i>No bookings found.</td></tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Search -->
+    <div class="card p-3 mb-4">
+        <h5 class="text-dark mb-2"><i class="bi bi-search me-2"></i>Search by Booking ID</h5>
+        <form action="/search-booking" method="get" class="d-flex gap-2 flex-wrap">
+            <input type="text" name="booking_id" placeholder="SMT-12345" class="form-control" style="max-width:260px;" required>
+            <button type="submit" class="btn btn-dark fw-bold">Search</button>
+        </form>
+    </div>
+
+    <!-- ===================== VEHICLES SECTION ===================== -->
+    <div class="card mb-4 section-anchor" id="vehicles-section">
+        <div class="card-header bg-warning text-dark d-flex justify-content-between align-items-center py-3">
+            <h5 class="mb-0"><i class="bi bi-car-front me-2"></i>Vehicle Rates — Edit & Delete</h5>
+            <span class="badge bg-dark">{{ vehicles|length }} Vehicles</span>
+        </div>
+        <div class="card-body">
+
+            <!-- ADD VEHICLE FORM -->
+            <div class="bg-light rounded-3 p-3 mb-4">
+                <h6 class="fw-bold mb-3 text-success"><i class="bi bi-plus-circle me-1"></i>Add New Vehicle</h6>
+                <form action="/add-vehicle" method="post" class="row g-2">
+                    <div class="col-6 col-md-2">
+                        <select name="category" class="form-select form-select-sm" required>
+                            <option value="car">🚗 Car</option>
+                            <option value="tempo">🚐 Tempo/Van</option>
+                            <option value="bus">🚌 Bus</option>
+                        </select>
+                    </div>
+                    <div class="col-6 col-md-2"><input type="text" name="name"  class="form-control form-control-sm" placeholder="Vehicle Name" required></div>
+                    <div class="col-6 col-md-1"><input type="text" name="rate"  class="form-control form-control-sm" placeholder="Rate" required></div>
+                    <div class="col-6 col-md-1"><input type="text" name="seats" class="form-control form-control-sm" placeholder="Seats"></div>
+                    <div class="col-6 col-md-2"><input type="text" name="type"  class="form-control form-control-sm" placeholder="Type (Sedan etc)"></div>
+                    <div class="col-6 col-md-1"><input type="text" name="bata"  class="form-control form-control-sm" placeholder="Bata"></div>
+                    <div class="col-12 col-md-2"><input type="text" name="img"  class="form-control form-control-sm" placeholder="Image path"></div>
+                    <div class="col-12 col-md-1"><button type="submit" class="btn btn-success btn-sm w-100 fw-bold">Add</button></div>
+                </form>
+            </div>
+
+            <!-- VEHICLE TABLE -->
+            <div class="table-responsive">
+                <table class="table table-hover align-middle">
+                    <thead class="table-dark">
+                        <tr>
+                            <th>#</th>
+                            <th>Category</th>
+                            <th>Vehicle Name</th>
+                            <th>Type</th>
+                            <th>Seats</th>
+                            <th>Rate</th>
+                            <th>Bata</th>
+                            <th style="min-width:130px;">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for v in vehicles %}
+                        <tr class="vehicle-row">
+                            <td class="text-muted small">{{ v['id'] }}</td>
+                            <td>
+                                <span class="badge badge-cat
+                                    {% if v['category']=='car' %}bg-primary
+                                    {% elif v['category']=='tempo' %}bg-warning text-dark
+                                    {% else %}bg-danger{% endif %}">
+                                    {{ v['category']|upper }}
+                                </span>
+                            </td>
+                            <td class="fw-bold">{{ v['name'] }}</td>
+                            <td class="small text-muted">{{ v['type'] }}</td>
+                            <td>{{ v['seats'] }}</td>
+                            <td><span class="fw-bold text-success">{{ v['rate'] }}</span></td>
+                            <td class="text-danger small fw-bold">{{ v['bata'] }}</td>
+                            <td>
+                                <!-- EDIT BUTTON → opens modal with this vehicle's data -->
+                                <button class="btn-edit me-1"
+                                    onclick="openEditModal(
+                                        '{{ v['id'] }}',
+                                        '{{ v['category'] }}',
+                                        '{{ v['name'] }}',
+                                        '{{ v['rate'] }}',
+                                        '{{ v['seats'] }}',
+                                        '{{ v['type'] }}',
+                                        '{{ v['img'] }}',
+                                        '{{ v['bata'] }}'
+                                    )">
+                                    <i class="bi bi-pencil-fill"></i> Edit
+                                </button>
+                                <!-- DELETE BUTTON -->
+                                <button class="btn-del"
+                                    onclick="confirmDelete('/delete-vehicle/{{ v['id'] }}', '{{ v['name'] }} delete panna va?')">
+                                    <i class="bi bi-trash-fill"></i> Delete
+                                </button>
+                            </td>
+                        </tr>
+                        {% else %}
+                        <tr><td colspan="8" class="text-center text-muted py-4">No vehicles found.</td></tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===================== MAIN PACKAGES ===================== -->
+    <div class="card p-4 mb-4">
+        <h4 class="text-success mb-3"><i class="bi bi-plus-square me-2"></i>Add New Main Package</h4>
+        <form action="/add" method="post" class="row g-3">
+            <div class="col-md-4"><input type="text" name="place" placeholder="Place Name" class="form-control" required></div>
+            <div class="col-md-2"><input type="text" name="price" placeholder="Price" class="form-control" required></div>
+            <div class="col-md-2"><input type="text" name="days" placeholder="Days" class="form-control" required></div>
+            <div class="col-md-2"><input type="text" name="km" placeholder="Details/KM" class="form-control" required></div>
+            <div class="col-md-2">
+                <select name="type" class="form-select">
+                   <option value="is_temple">Temple Tour</option>
+                   <option value="is_navagraha">Navagraha</option>
+                   <option value="is_divyadesam">Divya Desam</option>
+                   <option value="is_kerala">Kerala</option>
+                   <option value="is_karnataka">Karnataka</option>
+                   <option value="is_goa">Goa</option>
+                </select>
+            </div>
+            <div class="col-12"><input type="text" name="img" placeholder="Image URL (static/images/name.jpg)" class="form-control" required></div>
+            <div class="col-12"><button type="submit" class="btn btn-success w-100">Add Main Package</button></div>
+        </form>
+        <h5 class="mt-4">Live Main Packages</h5>
+        <div class="table-responsive">
+            <table class="table table-sm table-hover border">
+                <thead class="table-light"><tr><th>Place</th><th>Flag</th><th>Delete</th></tr></thead>
+                <tbody>
+                    {% for p in packages %}
+                    <tr>
+                        <td>{{ p['place'] }}</td>
+                        <td><span class="badge bg-secondary">{{ p['type_flag'] }}</span></td>
+                        <td>
+                            <button class="btn-del"
+                                onclick="confirmDelete('/delete-main-package/{{ p['id'] }}', '{{ p['place'] }} delete panna va?')">
+                                <i class="bi bi-trash"></i> Delete
+                            </button>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- ===================== PLACES / TEMPLES ===================== -->
+    <div class="card p-4 mb-4">
+        <h4 class="text-primary mb-3"><i class="bi bi-geo-alt me-2"></i>Add Places (Temples / Tours)</h4>
+        <form action="/add-temple-place" method="post" class="row g-3">
+            <div class="col-md-3">
+                <select name="category" class="form-select" required>
+                    <option value="aarupadai">Aarupadai Veedu</option>
+                    <option value="navagraha">Navagraha Temples</option>
+                    <option value="divyadesam">Divya Desam</option>
+                    <option value="kerala">Kerala Tour</option>
+                    <option value="karnataka">Karnataka Tour</option>
+                    <option value="goa">Goa Tour</option>
+                </select>
+            </div>
+            <div class="col-md-3"><input type="text" name="place" placeholder="Place / Temple Name" class="form-control" required></div>
+            <div class="col-md-3"><input type="text" name="desc"  placeholder="Planet / Description" class="form-control" required></div>
+            <div class="col-md-3"><input type="text" name="price" placeholder="Price (Included)" class="form-control" required></div>
+            <div class="col-12"><input type="text" name="img" placeholder="Image Path (static/images/...)" class="form-control" required></div>
+            <div class="col-12"><button type="submit" class="btn btn-primary w-100">Save Place</button></div>
+        </form>
+        <h5 class="mt-4">All Places / Temples</h5>
+        <div class="table-responsive" style="max-height:400px;overflow-y:auto;">
+            <table class="table table-hover mt-2">
+                <thead class="table-dark" style="position:sticky;top:0;">
+                    <tr><th>Category</th><th>Name</th><th>Info</th><th>Delete</th></tr>
+                </thead>
+                <tbody>
+                    {% for tp in temple_packages %}
+                    <tr>
+                        <td>
+                            <span class="badge
+                                {% if tp['category']=='kerala' %}bg-success
+                                {% elif tp['category']=='goa' %}bg-warning text-dark
+                                {% elif tp['category']=='karnataka' %}bg-info text-dark
+                                {% elif tp['category']=='divyadesam' %}bg-primary
+                                {% else %}bg-secondary{% endif %}">
+                                {{ tp['category']|upper }}
+                            </span>
+                        </td>
+                        <td>{{ tp['place'] }}</td>
+                        <td>{{ tp['desc'] }}</td>
+                        <td>
+                            <button class="btn-del"
+                                onclick="confirmDelete('/delete-temple/{{ tp['id'] }}', '{{ tp['place'] }} delete panna va?')">
+                                <i class="bi bi-trash"></i> Delete
+                            </button>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- ===================== EDIT VEHICLE MODAL ===================== -->
+<div class="modal fade" id="editVehicleModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow" style="border-radius:20px; overflow:hidden;">
+            <div class="modal-header bg-warning text-dark py-3">
+                <h5 class="modal-title fw-bold"><i class="bi bi-pencil-fill me-2"></i>Edit Vehicle</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body p-4">
+                <form action="/update-vehicle" method="post" class="row g-3">
+                    <input type="hidden" name="id" id="edit_id">
+                    <div class="col-6">
+                        <label class="form-label fw-semibold small">Category</label>
+                        <select name="category" id="edit_category" class="form-select form-select-sm" required>
+                            <option value="car">🚗 Car</option>
+                            <option value="tempo">🚐 Tempo/Van</option>
+                            <option value="bus">🚌 Bus</option>
+                        </select>
+                    </div>
+                    <div class="col-6">
+                        <label class="form-label fw-semibold small">Vehicle Name</label>
+                        <input type="text" name="name" id="edit_name" class="form-control form-control-sm" required>
+                    </div>
+                    <div class="col-6">
+                        <label class="form-label fw-semibold small">Rate</label>
+                        <input type="text" name="rate" id="edit_rate" class="form-control form-control-sm" placeholder="₹13/km" required>
+                    </div>
+                    <div class="col-6">
+                        <label class="form-label fw-semibold small">Driver Bata</label>
+                        <input type="text" name="bata" id="edit_bata" class="form-control form-control-sm" placeholder="₹400">
+                    </div>
+                    <div class="col-6">
+                        <label class="form-label fw-semibold small">Seats</label>
+                        <input type="text" name="seats" id="edit_seats" class="form-control form-control-sm" placeholder="4+1">
+                    </div>
+                    <div class="col-6">
+                        <label class="form-label fw-semibold small">Type</label>
+                        <input type="text" name="type" id="edit_type" class="form-control form-control-sm" placeholder="Sedan / MUV">
+                    </div>
+                    <div class="col-12">
+                        <label class="form-label fw-semibold small">Image Path</label>
+                        <input type="text" name="img" id="edit_img" class="form-control form-control-sm" placeholder="static/images/...">
+                    </div>
+                    <div class="col-12 mt-2">
+                        <button type="submit" class="btn btn-warning w-100 fw-bold py-2 text-dark">
+                            <i class="bi bi-check-circle me-2"></i>Update Vehicle
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ===================== CUSTOM CONFIRM DELETE ===================== -->
+<div class="confirm-overlay" id="confirmOverlay">
+    <div class="confirm-box shadow-lg">
+        <div class="mb-3" style="font-size:2.5rem;">🗑️</div>
+        <h5 class="fw-bold mb-2" id="confirmMsg">Delete panna va?</h5>
+        <p class="text-muted small mb-4">Idhu undo panna mudiyaathu!</p>
+        <div class="d-flex gap-3 justify-content-center">
+            <button class="btn btn-light px-4 rounded-pill" onclick="closeConfirm()">Cancel</button>
+            <a id="confirmYesBtn" href="#" class="btn btn-danger px-4 rounded-pill fw-bold">Delete</a>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    // ---- Edit Modal ----
+    function openEditModal(id, category, name, rate, seats, type, img, bata) {
+        document.getElementById('edit_id').value       = id;
+        document.getElementById('edit_name').value     = name;
+        document.getElementById('edit_rate').value     = rate;
+        document.getElementById('edit_seats').value    = seats;
+        document.getElementById('edit_type').value     = type;
+        document.getElementById('edit_img').value      = img;
+        document.getElementById('edit_bata').value     = bata;
+        // Set category dropdown
+        var sel = document.getElementById('edit_category');
+        for (var i = 0; i < sel.options.length; i++) {
+            if (sel.options[i].value === category) { sel.selectedIndex = i; break; }
+        }
+        new bootstrap.Modal(document.getElementById('editVehicleModal')).show();
+    }
+
+    // ---- Confirm Delete overlay ----
+    function confirmDelete(url, msg) {
+        document.getElementById('confirmMsg').innerText = msg;
+        document.getElementById('confirmYesBtn').href   = url;
+        document.getElementById('confirmOverlay').classList.add('show');
+    }
+    function closeConfirm() {
+        document.getElementById('confirmOverlay').classList.remove('show');
+    }
+    // Close on outside click
+    document.getElementById('confirmOverlay').addEventListener('click', function(e) {
+        if (e.target === this) closeConfirm();
+    });
+</script>
+</body>
+</html>

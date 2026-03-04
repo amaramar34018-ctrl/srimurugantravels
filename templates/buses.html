@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bus Rentals | Sri Murugan Travels</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root { --primary:#7f1d1d; --accent:#ef4444; }
+        html,body{overflow-x:hidden;} *{box-sizing:border-box;}
+        body{background:#fff5f5;font-family:'Plus Jakarta Sans',sans-serif;}
+
+        .site-header{background:linear-gradient(135deg,#7f1d1d 0%,#dc2626 100%);padding:22px 0 18px;}
+        .site-header h1{font-size:1.4rem;font-weight:800;}
+        .back-btn{display:inline-flex;align-items:center;gap:6px;background:rgba(255,255,255,0.15);color:#fff;border:1px solid rgba(255,255,255,0.3);border-radius:50px;padding:7px 20px;font-size:0.85rem;font-weight:600;text-decoration:none;transition:0.2s;margin-top:10px;}
+        .back-btn:hover{background:rgba(255,255,255,0.3);color:#fff;}
+
+        .page-title{padding:36px 0 4px;text-align:center;}
+        .page-title h2{font-size:1.7rem;font-weight:800;color:#1e293b;text-transform:uppercase;letter-spacing:1px;}
+        .title-bar{width:56px;height:4px;background:var(--accent);border-radius:4px;margin:10px auto 0;}
+        .page-title p{color:#64748b;font-size:0.88rem;margin-top:10px;}
+
+        .vehicle-card{background:#fff;border-radius:20px;overflow:hidden;box-shadow:0 2px 16px rgba(0,0,0,0.07);transition:transform 0.3s,box-shadow 0.3s;display:flex;flex-direction:column;height:100%;}
+        .vehicle-card:hover{transform:translateY(-6px);box-shadow:0 16px 40px rgba(0,0,0,0.13);}
+
+        .card-img-wrap{width:100%;aspect-ratio:16/9;background:#fff5f5;overflow:hidden;position:relative;}
+        .card-img-wrap img{width:100%;height:100%;object-fit:contain;object-position:center;padding:10px;transition:transform 0.4s;}
+        .vehicle-card:hover .card-img-wrap img{transform:scale(1.05);}
+        .cat-pill{position:absolute;top:10px;left:10px;background:var(--primary);color:#fff;font-size:0.68rem;font-weight:700;padding:3px 12px;border-radius:50px;text-transform:uppercase;letter-spacing:0.5px;}
+
+        .card-body-inner{padding:16px 18px 18px;display:flex;flex-direction:column;flex:1;}
+        .car-name{font-size:1.08rem;font-weight:800;color:#1e293b;margin-bottom:8px;}
+        .badges-row{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px;}
+        .info-badge{background:#fee2e2;color:#7f1d1d;border-radius:8px;padding:4px 10px;font-size:0.73rem;font-weight:600;}
+
+        .rate-box{background:linear-gradient(135deg,#fff5f5,#fee2e2);border:1px solid #fecaca;border-radius:14px;padding:14px 16px;margin-bottom:14px;}
+        .rate-val{font-size:1.55rem;font-weight:800;color:#991b1b;line-height:1;}
+        .rate-sub{font-size:0.73rem;color:#64748b;margin-top:3px;}
+        .bata-row{display:flex;align-items:center;gap:6px;margin-top:9px;padding-top:9px;border-top:1px dashed #fecaca;}
+        .bata-label{font-size:0.76rem;color:#64748b;}
+        .bata-val{font-size:0.82rem;font-weight:700;color:#dc2626;}
+
+        .book-btn{margin-top:auto;background:var(--accent);color:#fff;border:none;border-radius:50px;padding:12px;font-size:0.95rem;font-weight:700;width:100%;cursor:pointer;transition:0.25s;}
+        .book-btn:hover{background:#b91c1c;}
+
+        .modal-content{border-radius:24px;overflow:hidden;border:none;}
+        .form-control{border-radius:12px;border:1.5px solid #e2e8f0;padding:10px 16px;font-size:0.9rem;}
+        .form-control:focus{border-color:#dc2626;box-shadow:0 0 0 3px rgba(220,38,38,0.15);}
+        .form-label{font-size:0.82rem;font-weight:700;color:#374151;margin-bottom:5px;}
+
+        footer{background:#1e293b;color:#94a3b8;padding:26px 0;text-align:center;font-size:0.85rem;}
+
+        @media(max-width:767px){
+            .page-title h2{font-size:1.3rem;}
+            .card-img-wrap{aspect-ratio:4/3;}
+            .rate-val{font-size:1.3rem;}
+            .modal-body .col-md-6,.modal-body .col-6{width:100%!important;flex:0 0 100%!important;max-width:100%!important;}
+        }
+        @media(max-width:575px){
+            .site-header h1{font-size:1rem;}
+            .container{padding-left:14px;padding-right:14px;}
+            .modal-dialog{margin:10px;}
+        }
+    </style>
+</head>
+<body>
+
+<div class="site-header">
+    <div class="container text-center text-white">
+        <h1 class="mb-0">🚌 SRI MURUGAN <span style="color:#fecaca;">TRAVELS</span></h1>
+        <a href="javascript:void(0);" onclick="window.history.back();" class="back-btn">
+            <i class="bi bi-arrow-left"></i> Back
+        </a>
+    </div>
+</div>
+
+<div class="page-title">
+    <div class="container">
+        <h2>Bus Rentals</h2>
+        <div class="title-bar"></div>
+        <p>Large group travel · Corporate tours · Pilgrimages · Events</p>
+    </div>
+</div>
+
+<div class="container pb-5 mt-4">
+    <div class="row g-4 row-cols-1 row-cols-sm-2 row-cols-lg-3">
+        {% for v in vehicles %}
+        <div class="col">
+            <div class="vehicle-card">
+                <div class="card-img-wrap">
+                    <img src="{{ v.img }}" alt="{{ v.name }}"
+                         onerror="this.src='https://images.unsplash.com/photo-1570125909232-eb263c188f7e?auto=format&fit=crop&w=600&q=80'">
+                    <span class="cat-pill">{{ v.type if v.type else 'Bus' }}</span>
+                </div>
+                <div class="card-body-inner">
+                    <div class="car-name">{{ v.name }}</div>
+                    <div class="badges-row">
+                        <span class="info-badge"><i class="bi bi-people-fill me-1"></i>{{ v.seats }} Seater</span>
+                        <span class="info-badge"><i class="bi bi-shield-check-fill me-1"></i>Long Distance</span>
+                    </div>
+                    <div class="rate-box">
+                        <div class="rate-val">{{ v.rate }}</div>
+                        <div class="rate-sub">Per km · AC/Non-AC · Group travel</div>
+                        <div class="bata-row">
+                            <span class="bata-label"><i class="bi bi-person-fill me-1"></i>Driver Bata:</span>
+                            <span class="bata-val">{{ v.bata if v.bata else '—' }}</span>
+                        </div>
+                    </div>
+                    <button class="book-btn" onclick="openBooking('{{ v.name }}')">
+                        <i class="bi bi-calendar-check me-2"></i>Book Now
+                    </button>
+                </div>
+            </div>
+        </div>
+        {% else %}
+        <div class="col-12 text-center py-5 text-muted">
+            <i class="bi bi-truck-front fs-1 d-block mb-3"></i>No buses available.
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+<div class="modal fade" id="bookingModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content shadow-lg">
+            <div class="modal-header text-white" style="background:#dc2626;">
+                <h5 class="modal-title fw-bold"><i class="bi bi-truck-front-fill me-2"></i>Book: <span id="displayVehicleName"></span></h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body p-4">
+                <form action="/save-bus-booking" method="POST">
+                    <input type="hidden" id="selectedVehicle" name="car_name">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label">Your Name</label>
+                            <input type="text" name="name" class="form-control" placeholder="Full Name" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Phone Number</label>
+                            <input type="tel" name="phone" class="form-control" placeholder="Mobile Number" required>
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label">Pickup Location</label>
+                            <input type="text" name="pickup" class="form-control" placeholder="Pickup address" required>
+                        </div>
+                        <div class="col-6">
+                            <label class="form-label">Travel Date</label>
+                            <input type="date" name="date" class="form-control" required>
+                        </div>
+                        <div class="col-6">
+                            <label class="form-label">No. of Days</label>
+                            <input type="number" name="days" class="form-control" placeholder="Days" min="1" required>
+                        </div>
+                        <div class="col-12 mt-1">
+                            <button type="submit" class="btn w-100 py-3 fw-bold rounded-pill"
+                                style="background:#25D366;color:#fff;font-size:1rem;">
+                                <i class="bi bi-whatsapp me-2"></i>Confirm & Send to WhatsApp
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<footer><p class="mb-0">© 2026 Sri Murugan Travels · Tiruchirappalli, Tamil Nadu</p></footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    function openBooking(name) {
+        document.getElementById('selectedVehicle').value = name;
+        document.getElementById('displayVehicleName').innerText = name;
+        new bootstrap.Modal(document.getElementById('bookingModal')).show();
+    }
+</script>
+</body>
+</html>
